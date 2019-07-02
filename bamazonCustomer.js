@@ -92,4 +92,3 @@ function choices() {
       })
 }
 
-//add list to choose to exit or continue
