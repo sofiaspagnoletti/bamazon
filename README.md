@@ -2,7 +2,7 @@
 Bamazon is an Amazon-like storefront. 
 
 ### Overview
-This node application has two versiones, one of them designed for the customer and the other one designed for the manager's store needs. 
+This node application has two versions: one of them designed for the customer and the other one designed for the manager's store needs. 
 
 #### bamazonCustomers 
 Shows the items available to the costumer and asks the user to enter the ID of the product they would like to buy, if the stock quantity of the selected item is enough to meet the desired quantity by the user, the total cost would be shown and the order would be placed. 
