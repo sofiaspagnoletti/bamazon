@@ -46,20 +46,26 @@ function buyProd() {
       }
     ])
     .then(function (answer) {
-        var selectProd = answer.selectProd;
-        var selectQuantity = parseInt(answer.selectQuantity);
-        connection.query("UPDATE products SET stock_quantity=stock_quantity-" + selectQuantity + " WHERE item_id= " + selectProd), function (err, data) {
-          if (err) throw err;
+      const selectProd = answer.selectProd;
+      const selectQuantity = parseInt(answer.selectQuantity);
+
+      connection.query("SELECT stock_quantity FROM products WHERE item_id = " + selectProd, function (err, result) {
+        if (err) throw err;
+        if (result[0].stock_quantity < selectQuantity) {
+          console.log("Insufficient quantity!")
+          start();
+        } else {
+          const updateQueryText = "UPDATE products SET stock_quantity = stock_quantity - " + selectQuantity + " WHERE item_id = " + selectProd;
+          connection.query(updateQueryText, function (err) {
+            if (err) throw err;
+            connection.query("SELECT price FROM products WHERE item_id = " + selectProd, function (err, result) {
+              if (err) throw err;
+              console.log("Your order was successfully placed! Your total cost is: $" + result[0].price);
+            });
+          });
         }
-        console.table(data);
-        console.log("Your order was successfully placed!");
-        connection.end();
-      
-        //show table with quantity reduced
-        //show total cost
-        //else Insufficient quantity!
-        
-
-    })
-
+      });
+    });
 }
+
+//add list to choose to exit or continue
