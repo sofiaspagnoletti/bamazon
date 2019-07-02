@@ -15,7 +15,7 @@ var connection = mysql.createConnection({
   database: "bamazon_db"
 });
 
-connection.connect(function(err) {
+connection.connect(function (err) {
   if (err) throw err;
   runSearch();
 });
@@ -34,45 +34,47 @@ function runSearch() {
         "exit"
       ]
     })
-    .then((answer)=> {
+    .then((answer) => {
       switch (answer.action) {
-      case "View Products for Sale":
-        viewProducts();
-        break;
+        case "View Products for Sale":
+          viewProducts();
+          break;
 
-      case "View Low Inventory":
-        viewLowInv();
-        break;
+        case "View Low Inventory":
+          viewLowInv();
+          break;
 
-      case "Add to Inventory":
-        addToInv();
-        break;
+        case "Add to Inventory":
+          addToInv();
+          break;
 
-      case "Add New Product":
-        addNewProduct();
-        break;
-          
-      case "exit":
-        connection.end();
-        break;
+        case "Add New Product":
+          addNewProduct();
+          break;
+
+        case "exit":
+          connection.end();
+          break;
       }
     });
 }
 
 
-function viewProducts(params) {
-    connection.query("SELECT * FROM products", function (err, results) {
-        console.table(results);
-        if (err) throw err;
-        runSearch();
-      })
-    };
+function viewProducts() {
+  connection.query("SELECT * FROM products", function (err, results) {
+    console.table(results);
+    if (err) throw err;
+    console.log("==============");
+    runSearch();
+  })
+};
 
 function viewLowInv() {
-  connection.query("SELECT * FROM products where stock_quantity BETWEEN ? AND ?",[0, 5],function(err,data){
-      if (err) throw err;
-      console.table(data);
-      runSearch()
+  connection.query("SELECT * FROM products where stock_quantity BETWEEN ? AND ?", [0, 5], function (err, data) {
+    if (err) throw err;
+    console.table(data);
+    console.log("==============");
+    runSearch()
   })
 }
 //if theres no product with low stock conosole log message 
@@ -101,25 +103,58 @@ function addNewProduct(params) {
         message: "How many items are you adding to your stock?",
       }
     ])
-    .then(function(answer) {
+    .then(function (answer) {
       connection.query("INSERT INTO products SET ?",
-      {
-        product_name:answer.item,
-        department_name:answer.category,
-        price: answer.price,
-        stock_quantity: answer.quantity
-      },
-      function(err) {
-        if (err) throw err;
-        console.log("Your product successfully added!");
-        runSearch();
-      }
+        {
+          product_name: answer.item,
+          department_name: answer.category,
+          price: answer.price,
+          stock_quantity: answer.quantity
+        },
+        function (err) {
+          if (err) throw err;
+          console.log("Your product successfully added!");
+          console.log("==============");
+          runSearch();
+        }
       )
     })
-    
+
 }
 
-function addToInv(params) {
-    
+function addToInv() {
+  connection.query("SELECT * FROM products", function (err, results) {
+    console.table(results);
+    if (err) throw err;
+  })
+  inquirer
+    .prompt([
+      {
+        name: "selectProd",
+        type: "input",
+        message: "What's the item_ID of the product you would you like to add more quantity?"
+      },
+      {
+        name: "selectQuantity",
+        type: "input",
+        message: "How many units of the product would you like to add?"
+      }
+    ])
+    .then(function (answer) {
+      const selectProd = answer.selectProd;
+      const selectQuantity = parseInt(answer.selectQuantity);
+
+      connection.query("SELECT stock_quantity FROM products WHERE item_id = " + selectProd, function (err, result) {
+        const updateQueryText = "UPDATE products SET stock_quantity = stock_quantity + " + selectQuantity + " WHERE item_id = " + selectProd;
+        connection.query(updateQueryText, function (err) {
+          if (err) throw err;
+          connection.query("SELECT stock_quantity FROM products WHERE item_id = " + selectProd, function (err, result) {
+            if (err) throw err;
+            console.log("You successfully added items to the inventory! The current quantity is: " + result[0].stock_quantity);
+            console.log("==============");
+            runSearch();
+          });
+        });
+      });
+    });
 }
-// show table as a list and add quantity + number they wish to add 
