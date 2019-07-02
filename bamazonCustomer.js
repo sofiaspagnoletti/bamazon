@@ -60,7 +60,7 @@ function buyProd() {
             if (err) throw err;
             connection.query("SELECT price FROM products WHERE item_id = " + selectProd, function (err, result) {
               if (err) throw err;
-              console.log("Your order was successfully placed! Your total cost is: $" + result[0].price);
+              console.log("Your order was successfully placed! Your total cost is: $" + result[0].price*selectQuantity);
               choices();
             });
           });
