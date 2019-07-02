@@ -53,7 +53,7 @@ function buyProd() {
         if (err) throw err;
         if (result[0].stock_quantity < selectQuantity) {
           console.log("Insufficient quantity!")
-          start();
+          choices();
         } else {
           const updateQueryText = "UPDATE products SET stock_quantity = stock_quantity - " + selectQuantity + " WHERE item_id = " + selectProd;
           connection.query(updateQueryText, function (err) {
@@ -61,11 +61,35 @@ function buyProd() {
             connection.query("SELECT price FROM products WHERE item_id = " + selectProd, function (err, result) {
               if (err) throw err;
               console.log("Your order was successfully placed! Your total cost is: $" + result[0].price);
+              choices();
             });
           });
         }
       });
     });
+}
+
+function choices() {
+  inquirer.prompt({
+    name: 'action',
+    type: 'list',
+    message: 'What do you want to do?',
+    choices: [
+      "Continue",
+      "Exit"
+    ]
+        }).then(function (answer) {
+        var userChoice = answer.action;
+        switch (userChoice) {
+          case "Continue":
+            start();
+            break;
+
+          case "Exit":
+            connection.end();
+            break;
+        }
+      })
 }
 
 //add list to choose to exit or continue
