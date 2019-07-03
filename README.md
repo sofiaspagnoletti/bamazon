@@ -12,7 +12,7 @@ Allows the manager to view the products for sale, add new products to the list a
 
 
 ### Prerequisites
-This app cannot be deployed to GitHub pages but you can take a look at its funcionality by clicking on this link: 
+This app cannot be deployed to GitHub pages but you can take a look at its funcionality by clicking on this link: https://drive.google.com/open?id=1Z4d-fZb8qjUx_Abx9_OcB5cXqxFoCFUa
 
 ### Built With
 Node, MySQL, Inquirer. 
