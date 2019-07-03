@@ -4,25 +4,20 @@ var inquirer = require("inquirer");
 var connection = mysql.createConnection({
   host: "localhost",
 
-  // Your port; if not 3306
   port: 3306,
 
-  // Your username
   user: "root",
 
-  // Your password
-  password: "Naon21552155",
+  password: "123123123",
   database: "bamazon_db"
 });
 
 connection.connect(function (err) {
   if (err) throw err;
-  // run the start function after the connection is made to prompt the user
   start();
 });
 
 function start() {
-  // query the database for all items being auctioned
   connection.query("SELECT * FROM products", function (err, results) {
     console.table(results);
     if (err) throw err;
@@ -31,7 +26,6 @@ function start() {
 };
 
 function buyProd() {
-  // once you have the items, prompt the user for which they'd like to bid on
   inquirer
     .prompt([
       {
@@ -60,7 +54,7 @@ function buyProd() {
             if (err) throw err;
             connection.query("SELECT price FROM products WHERE item_id = " + selectProd, function (err, result) {
               if (err) throw err;
-              console.log("Your order was successfully placed! Your total cost is: $" + result[0].price*selectQuantity);
+              console.log("Your order was successfully placed! Your total cost is: $" + result[0].price * selectQuantity);
               choices();
             });
           });
@@ -78,17 +72,17 @@ function choices() {
       "Continue",
       "Exit"
     ]
-        }).then(function (answer) {
-        var userChoice = answer.action;
-        switch (userChoice) {
-          case "Continue":
-            start();
-            break;
+  }).then(function (answer) {
+    var userChoice = answer.action;
+    switch (userChoice) {
+      case "Continue":
+        start();
+        break;
 
-          case "Exit":
-            connection.end();
-            break;
-        }
-      })
+      case "Exit":
+        connection.end();
+        break;
+    }
+  })
 }
 

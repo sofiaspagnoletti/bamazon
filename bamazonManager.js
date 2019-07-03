@@ -4,14 +4,11 @@ var inquirer = require("inquirer");
 var connection = mysql.createConnection({
   host: "localhost",
 
-  // Your port; if not 3306
   port: 3306,
 
-  // Your username
   user: "root",
 
-  // Your password
-  password: "Naon21552155",
+  password: "123123123",
   database: "bamazon_db"
 });
 
@@ -31,7 +28,7 @@ function runSearch() {
         "View Low Inventory",
         "Add to Inventory",
         "Add New Product",
-        "exit"
+        "Exit"
       ]
     })
     .then((answer) => {
@@ -52,13 +49,12 @@ function runSearch() {
           addNewProduct();
           break;
 
-        case "exit":
+        case "Exit":
           connection.end();
           break;
       }
     });
 }
-
 
 function viewProducts() {
   connection.query("SELECT * FROM products", function (err, results) {
@@ -77,7 +73,6 @@ function viewLowInv() {
     runSearch()
   })
 }
-//if theres no product with low stock conosole log message 
 
 function addNewProduct(params) {
   inquirer
@@ -124,37 +119,40 @@ function addNewProduct(params) {
 
 function addToInv() {
   connection.query("SELECT * FROM products", function (err, results) {
-    console.table(results);
     if (err) throw err;
-  })
-  inquirer
-    .prompt([
-      {
-        name: "selectProd",
-        type: "input",
-        message: "What's the item_ID of the product you would you like to add more quantity?"
-      },
-      {
-        name: "selectQuantity",
-        type: "input",
-        message: "How many units of the product would you like to add?"
-      }
-    ])
-    .then(function (answer) {
-      const selectProd = answer.selectProd;
-      const selectQuantity = parseInt(answer.selectQuantity);
+    console.table(results);
+    inquirer
+      .prompt([
+        {
+          name: "selectProd",
+          type: "input",
+          message: "What's the item_ID of the product you would you like to add more quantity?"
+        },
+        {
+          name: "selectQuantity",
+          type: "input",
+          message: "How many units of the product would you like to add?"
+        }
+      ])
+      .then(function (answer) {
+        const selectProd = answer.selectProd;
+        const selectQuantity = parseInt(answer.selectQuantity);
 
-      connection.query("SELECT stock_quantity FROM products WHERE item_id = " + selectProd, function (err, result) {
-        const updateQueryText = "UPDATE products SET stock_quantity = stock_quantity + " + selectQuantity + " WHERE item_id = " + selectProd;
-        connection.query(updateQueryText, function (err) {
-          if (err) throw err;
-          connection.query("SELECT stock_quantity FROM products WHERE item_id = " + selectProd, function (err, result) {
+        connection.query("SELECT stock_quantity FROM products WHERE item_id = " + selectProd, function (err, result) {
+          const updateQueryText = "UPDATE products SET stock_quantity = stock_quantity + " + selectQuantity + " WHERE item_id = " + selectProd;
+          connection.query(updateQueryText, function (err) {
             if (err) throw err;
-            console.log("You successfully added items to the inventory! The current quantity is: " + result[0].stock_quantity);
-            console.log("==============");
-            runSearch();
+            connection.query("SELECT stock_quantity FROM products WHERE item_id = " + selectProd, function (err, result) {
+              if (err) throw err;
+              console.log("You successfully added items to the inventory! The current quantity is: " + result[0].stock_quantity);
+              console.log("==============");
+              runSearch();
+            });
           });
         });
       });
-    });
+  });
 }
+
+//fix update quantity in table after adding to inv 
+//fix wait till till prompt shows up in adding to inv 
